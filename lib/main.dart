@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'app/app.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const CesiZenApp());
 }
 
 class MyApp extends StatelessWidget {
