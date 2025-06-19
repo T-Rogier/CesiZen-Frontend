@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../core/presentation/providers/auth_provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -6,9 +9,16 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Accueil CesiZen")),
-      body: const Center(
-        child: Text("Bienvenue sur l'application de gestion du stress !"),
+      body: Center(
+        child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text("Bienvenue sur la page de d'accueil !"),
+          ElevatedButton(
+          onPressed: () => context.read<AuthProvider>().logout(),
+            child: const Text("Déconnexion"),
+          )
+        ]),
       ),
     );
   }

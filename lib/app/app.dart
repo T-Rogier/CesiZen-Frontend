@@ -1,6 +1,6 @@
+import 'package:cesizen_frontend/app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'router.dart';
+import '../core/router/router.dart';
 
 class CesiZenApp extends StatelessWidget {
   const CesiZenApp({super.key});
@@ -9,11 +9,9 @@ class CesiZenApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'CesiZen',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-      ),
-      routerConfig: goRouter,
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      routerConfig: goRouter(context),
     );
   }
 }
