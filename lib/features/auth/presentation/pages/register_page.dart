@@ -9,25 +9,37 @@ import 'package:cesizen_frontend/shared/widgets/inputs/app_text_input.dart';
 import 'package:cesizen_frontend/features/auth/presentation/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 
-class LoginPage extends ConsumerStatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends ConsumerStatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
-  bool _rememberMe = false;
+  bool _acceptTerms = false;
 
-  Future<void> _login() async {
-    debugPrint('[LOGIN PAGE] Bouton cliqué');
-    final email = _emailController.text;
-    final password = _passwordController.text;
+  Future<void> _register() async {
+    if (!_acceptTerms) return;
 
-    await ref.read(authProvider.notifier).login(email, password);
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Les mots de passe ne correspondent pas")),
+      );
+      return;
+    }
+
+    await ref.read(authProvider.notifier).register(
+      _usernameController.text,
+      _emailController.text,
+      _passwordController.text,
+      _confirmPasswordController.text,
+    );
   }
 
   @override
@@ -42,45 +54,47 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Text("Me connecter", style: AppTextStyles.title),
-              ),
+              Center(child: Text("Créer un compte", style: AppTextStyles.title)),
               const SizedBox(height: 32),
 
               AppTextInput(
-                label: "Votre adresse courriel",
-                hint: "Entrez votre adresse courriel",
+                label: "Votre nom d'utilisateur",
+                hint: "Entrez votre nom d'utilisateur",
+                controller: _usernameController,
+              ),
+              const SizedBox(height: 20),
+
+              AppTextInput(
+                label: "Votre adresse email",
+                hint: "Entrez votre adresse email",
                 controller: _emailController,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               AppPasswordInput(
                 label: "Mot de passe",
-                hint: "Entrez votre mot de passe",
+                hint: "Entrez un mot de passe",
                 controller: _passwordController,
               ),
+              const SizedBox(height: 20),
 
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    "Mot de passe oublié ?",
-                    style: TextStyle(color: AppColors.greenFont),
-                  ),
-                ),
+              AppPasswordInput(
+                label: "Confirmation du mot de passe",
+                hint: "Confirmez votre mot de passe",
+                controller: _confirmPasswordController,
               ),
+              const SizedBox(height: 20),
 
               AppCheckboxLabel(
-                value: _rememberMe,
-                onChanged: (val) => setState(() => _rememberMe = val ?? false),
-                label: "Se souvenir de moi",
+                value: _acceptTerms,
+                onChanged: (val) => setState(() => _acceptTerms = val ?? false),
+                label: "J’accepte les conditions générales",
               ),
               const SizedBox(height: 24),
 
               AppButton(
-                onPressed: auth.isLoading ? null : _login,
-                text: "Se connecter",
+                onPressed: (_acceptTerms && !auth.isLoading) ? _register : null,
+                text: "S’inscrire",
                 backgroundColor: AppColors.yellowPrincipal,
                 textColor: AppColors.black,
                 isLoading: auth.isLoading,
@@ -90,32 +104,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16),
                   child: Text(
-                    "Erreur de connexion",
+                    "Erreur d’inscription",
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 40),
 
               Center(
                 child: Column(
                   children: [
-                    Text("Vous n'avez pas de compte ?", style: Theme.of(context).textTheme.bodyMedium),
+                    Text("Vous avez déjà un compte ?", style: Theme.of(context).textTheme.bodyMedium),
                     TextButton(
                       onPressed: () {
-                        context.go('/register');
+                        context.go('/login');
                       },
                       child: Text(
-                        "Inscrivez-vous pour en obtenir un dès maintenant",
+                        "Connectez-vous",
                         style: TextStyle(
                           color: AppColors.greenFont,
                           decoration: TextDecoration.underline,
                         ),
                       ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => context.push('/home'),
-                      child: const Text('Voir Debug'),
                     ),
                   ],
                 ),

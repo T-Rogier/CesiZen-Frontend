@@ -1,12 +1,12 @@
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
-class UnboardingCard extends StatelessWidget {
+class WelcomeCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final String imagePath;
 
-  const UnboardingCard({super.key,
+  const WelcomeCard({super.key,
     required this.title,
     required this.subtitle,
     required this.imagePath,

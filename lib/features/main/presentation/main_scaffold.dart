@@ -1,40 +1,50 @@
+import 'package:cesizen_frontend/app/theme/app_theme.dart';
+import 'package:cesizen_frontend/features/main/presentation/widgets/custom_bottom_navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class MainScaffold extends StatelessWidget {
   final Widget child;
-  const MainScaffold({super.key, required this.child});
 
-  static final tabs = [
-    '/home',
-    '/search',
-    '/activities',
-    '/profile',
-  ];
+  const MainScaffold({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.toString();
-
-    int currentIndex = tabs.indexWhere((path) => location.startsWith(path));
-    if (currentIndex == -1) currentIndex = 0;
+    final currentIndex = _calculateIndex(context);
 
     return Scaffold(
-      body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          if (index != currentIndex) {
-            context.go(tabs[index]);
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Accueil"),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Recherche"),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Activités"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profil"),
-        ],
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: AppColors.greenFill,
+        elevation: 0,
+        title: Text(
+          _getTitle(currentIndex),
+          style: AppTextStyles.title,
+        ),
+        leading: Navigator.of(context).canPop()
+            ? const BackButton(color: AppColors.black)
+            : null,
       ),
+      body: child,
+      bottomNavigationBar: const CustomBottomNavbar(),
     );
+  }
+
+  int _calculateIndex(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+    if (location.startsWith('/search')) return 1;
+    if (location.startsWith('/activities')) return 2;
+    if (location.startsWith('/profile')) return 3;
+    return 0;
+  }
+
+  String _getTitle(int index) {
+    return switch (index) {
+      0 => 'Accueil',
+      1 => 'Rechercher',
+      2 => 'Activités',
+      3 => 'Profil',
+      _ => '',
+    };
   }
 }

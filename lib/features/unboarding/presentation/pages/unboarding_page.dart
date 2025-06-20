@@ -1,8 +1,6 @@
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/unboarding_card.dart';
-
 
 class UnboardingPage extends StatelessWidget {
   const UnboardingPage({super.key});
@@ -10,51 +8,61 @@ class UnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FCF9),
+      backgroundColor: AppColors.greenBackground,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 100),
-              const Text(
-                'Bienvenue sur CesiZen',
-                style: AppTextStyles.title
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Faites une pause. Ralentissez. Respirez.\nProfitez de notre bibliothèque de contenu pour vous aider à trouver l\'équilibre.',
-                style: AppTextStyles.subtitle
+              const Spacer(flex: 2),
+              // Logo
+              Image.asset(
+                'assets/images/logo.png',
+                height: 80,
               ),
               const SizedBox(height: 24),
-              Expanded(
-                child: ListView(
-                  children: [
-                    UnboardingCard(
-                      title: 'Exercices',
-                      subtitle: 'Trouvez la paix intérieure avec nos méditations guidées',
-                      imagePath: 'assets/images/exercices.png',
-                    ),
-                    UnboardingCard(
-                      title: 'Ecriture',
-                      subtitle: 'Libérez vos pensées avec nos exercices d\'écriture',
-                      imagePath: 'assets/images/ecriture.png',
-                    ),
-                    UnboardingCard(
-                      title: 'Musique',
-                      subtitle: 'Trouvez des chansons et listes de lecture pour vous détendre',
-                      imagePath: 'assets/images/musique.png',
-                    ),
-                    UnboardingCard(
-                      title: 'Puzzle',
-                      subtitle: 'Complétez des puzzles pour vous détendre',
-                      imagePath: 'assets/images/puzzle.png',
-                    ),
-                  ],
+
+              // Titre principal
+              Text(
+                "L’application de votre santé mentale",
+                textAlign: TextAlign.center,
+                style: AppTextStyles.title.copyWith(
+                  color: AppColors.yellowPrincipal,
                 ),
               ),
               const SizedBox(height: 12),
+
+              // Sous-titre
+              Text(
+                "Des exercices de respiration, de méditation\net de visualisation pour vous aider à mieux\ngérer le stress.",
+                textAlign: TextAlign.center,
+                style: AppTextStyles.subtitle.copyWith(
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+
+              const Spacer(flex: 3),
+
+              // Bouton S'inscrire
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.go('/register');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.greenFont,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: Text("S'inscrire", style: AppTextStyles.button),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Bouton Se connecter
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -63,15 +71,47 @@ class UnboardingPage extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.yellowPrincipal,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(32),
                     ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: const Text(
-                    'Commencer',
-                    style: AppTextStyles.button
+                  child: Text("Se connecter", style: AppTextStyles.button),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Bouton Passer cette étape
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // TODO: accès direct sans connexion
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.greenFill,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
+                  child: Text(
+                    "Passer cette étape",
+                    style: AppTextStyles.button.copyWith(
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+              ),
+
+              const Spacer(),
+
+              Text(
+                "En continuant, vous acceptez les Conditions d'utilisation.\nLisez notre Politique de confidentialité.",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.greenFont,
+                  fontSize: 12,
                 ),
               ),
               const SizedBox(height: 24),

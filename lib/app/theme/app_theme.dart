@@ -33,21 +33,55 @@ class AppTextStyles {
 class AppTheme {
   static ThemeData get light {
     return ThemeData(
+      useMaterial3: true,
       fontFamily: 'Epilogue',
+      textTheme: ThemeData.light().textTheme.apply(fontFamily: 'Epilogue'),
+
       primaryColor: AppColors.greenFont,
-      scaffoldBackgroundColor: AppColors.greenBackground,
-      textTheme: const TextTheme(
-        titleLarge: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: AppColors.greenFont,
+      scaffoldBackgroundColor: AppColors.white,
+      splashColor: AppColors.greenFont.withOpacity(0.1),
+      highlightColor: Colors.transparent,
+      focusColor: AppColors.greenFont,
+
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.greenFont,
+        secondary: AppColors.greenFill,
+        surfaceContainer: AppColors.greenBackground,
+        onPrimary: AppColors.white,
+        onSecondary: AppColors.black,
+        onSurface: AppColors.black,
+        surface: AppColors.white,
+      ),
+
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: AppColors.greenFont,
+        selectionColor: AppColors.greenFill,
+        selectionHandleColor: AppColors.greenFont,
+      ),
+
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.greenFill,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: AppColors.black,
+        hintStyle: const TextStyle(color: AppColors.greenFont),
+      ),
+
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.all(AppColors.white),
+      ),
+
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          textStyle: AppTextStyles.button,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(32),
+          ),
         ),
       ),
-      // etc.
     );
   }
 }
+

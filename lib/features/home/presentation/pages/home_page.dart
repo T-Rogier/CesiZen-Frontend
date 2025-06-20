@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../../../core/presentation/providers/auth_provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,10 +11,6 @@ class HomePage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text("Bienvenue sur la page de d'accueil !"),
-          ElevatedButton(
-          onPressed: () => context.read<AuthProvider>().logout(),
-            child: const Text("Déconnexion"),
-          )
         ]),
       ),
     );
