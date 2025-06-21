@@ -1,22 +1,33 @@
-import 'package:cesizen_frontend/shared/widgets/inputs/app_search_bar.dart';
-import 'package:flutter/material.dart';
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
+import 'package:cesizen_frontend/features/activities/presentation/providers/activity_provider.dart';
 import 'package:cesizen_frontend/features/activities/presentation/widgets/activity_card.dart';
 import 'package:cesizen_frontend/features/activities/presentation/widgets/filters_dropdown.dart';
+import 'package:cesizen_frontend/shared/widgets/inputs/app_search_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ActivitiesPage extends StatefulWidget {
+class ActivitiesPage extends ConsumerStatefulWidget {
   const ActivitiesPage({super.key});
 
   @override
-  State<ActivitiesPage> createState() => _ActivitiesPageState();
+  ConsumerState<ActivitiesPage> createState() => _ActivitiesPageState();
 }
 
-class _ActivitiesPageState extends State<ActivitiesPage> {
+class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
   bool _showFilters = false;
   String searchQuery = '';
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Écoute de l'état AsyncValue<ActivityState>
+    final asyncState = ref.watch(activityProvider);
+    debugPrint('🔄 ActivitiesPage.build – query="$searchQuery", _showFilters=$_showFilters');
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -28,12 +39,21 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                   child: AppSearchBar(
                     hintText: 'Rechercher une activité...',
                     value: searchQuery,
-                    onChanged: (val) => setState(() => searchQuery = val),
+                    onChanged: (val) {
+                      debugPrint('✏️ AppSearchBar.onChanged: $val');
+                      setState(() => searchQuery = val);
+                      // Lancer la recherche à chaque changement (ou
+                      // tu peux plutôt faire sur onSubmitted si tu préfères)
+                      ref
+                          .read(activityProvider.notifier)
+                          .searchActivities(query: searchQuery);
+                    },
                   ),
                 ),
                 const SizedBox(width: 14),
                 IconButton(
-                  onPressed: () => setState(() => _showFilters = !_showFilters),
+                  onPressed: () =>
+                      setState(() => _showFilters = !_showFilters),
                   icon: Icon(
                     Icons.filter_list,
                     color: AppColors.greenFont,
@@ -57,51 +77,30 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               ),
             const SizedBox(height: 12),
             Expanded(
-              child: ListView(
-                children: [
-                  ActivityCard(
-                    title: 'Comment surpasser ses émotions ?',
-                    subtitle: 'Un petit cours du Dr Jean Roger',
-                    imageUrl: 'https://picsum.photos/200',
-                    participationCount: 120,
-                    onPressed: () => {},
-                  ),
-                  ActivityCard(
-                    title: 'Alimentation consciente',
-                    subtitle: 'Challenge de 7 jours',
-                    imageUrl: 'https://picsum.photos/200',
-                    participationCount: 80,
-                    onPressed: () => {},
-                  ),
-                  ActivityCard(
-                    title: 'Yoga pour la concentration sur soi-même',
-                    subtitle: 'Un petit cours du Dr Jean Roger',
-                    imageUrl: 'https://picsum.photos/200',
-                    participationCount: 200,
-                    onPressed: () => {},
-                  ),
-                  ActivityCard(
-                    title: 'Yoga pour la concentration sur soi-même',
-                    subtitle: 'Un petit cours du Dr Jean Roger',
-                    imageUrl: 'https://picsum.photos/200',
-                    participationCount: 200,
-                    onPressed: () => {},
-                  ),
-                  ActivityCard(
-                    title: 'Yoga pour la concentration sur soi-même',
-                    subtitle: 'Un petit cours du Dr Jean Roger',
-                    imageUrl: 'https://picsum.photos/200',
-                    participationCount: 200,
-                    onPressed: () => {},
-                  ),
-                  ActivityCard(
-                    title: 'Yoga pour la concentration sur soi-même',
-                    subtitle: 'Un petit cours du Dr Jean Roger',
-                    imageUrl: 'https://picsum.photos/200',
-                    participationCount: 200,
-                    onPressed: () => {},
-                  ),
-                ],
+              child: asyncState.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, st) => Center(child: Text('Erreur: $err')),
+                data: (state) {
+                  final list = state.activities;
+                  if (list.isEmpty) {
+                    return const Center(child: Text('Aucune activité trouvée'));
+                  }
+                  return ListView.builder(
+                    itemCount: list.length,
+                    itemBuilder: (_, i) {
+                      final act = list[i];
+                      return ActivityCard(
+                        title: act.title,
+                        subtitle: act.estimatedDuration,
+                        imageUrl: act.thumbnailImageLink,
+                        participationCount: act.viewCount,
+                        onPressed: () {
+                          // TODO: naviguer vers le détail
+                        },
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],

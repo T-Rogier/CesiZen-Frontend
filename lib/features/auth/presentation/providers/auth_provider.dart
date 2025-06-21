@@ -13,11 +13,11 @@ final authProvider = AsyncNotifierProvider<AuthNotifier, AuthState>(
 );
 
 class AuthNotifier extends AsyncNotifier<AuthState> {
-  late final AuthRepository _repo;
+  late final AuthRepository _repository;
 
   @override
   Future<AuthState> build() async {
-    _repo = ref.read(authRepositoryProvider);
+    _repository = ref.read(authRepositoryProvider);
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -31,7 +31,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
 
   Future<void> login(String email, String password) async {
     state = const AsyncValue.loading();
-    final session = await _repo.login(email, password);
+    final session = await _repository.login(email, password);
     if (session != null) {
       state = AsyncValue.data(AuthState.authenticated(session));
     } else {
@@ -41,7 +41,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
 
   Future<void> register(String username, String email, String password, String confirmPassword) async {
     state = const AsyncValue.loading();
-    final session = await _repo.register(username, email, password, confirmPassword);
+    final session = await _repository.register(username, email, password, confirmPassword);
     if (session != null) {
       state = AsyncValue.data(AuthState.authenticated(session));
     } else {
@@ -50,7 +50,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   }
 
   Future<void> logout() async {
-    await _repo.logout();
+    await _repository.logout();
     state = AsyncValue.data(const AuthState.unauthenticated());
   }
 }
