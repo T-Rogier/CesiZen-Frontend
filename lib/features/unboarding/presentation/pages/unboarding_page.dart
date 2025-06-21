@@ -26,7 +26,7 @@ class UnboardingPage extends StatelessWidget {
               Text(
                 "L’application de votre santé mentale",
                 textAlign: TextAlign.center,
-                style: AppTextStyles.title.copyWith(
+                style: AppTextStyles.headline.copyWith(
                   color: AppColors.yellowPrincipal,
                 ),
               ),

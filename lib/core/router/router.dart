@@ -1,6 +1,10 @@
+import 'package:cesizen_frontend/features/activities/presentation/pages/activity_create_page.dart';
+import 'package:cesizen_frontend/features/activities/presentation/pages/activity_detail_page.dart';
 import 'package:cesizen_frontend/features/auth/presentation/providers/go_router_refresh_notifier.dart';
 import 'package:cesizen_frontend/features/debug/presentation/pages/debug_page.dart';
 import 'package:cesizen_frontend/features/main/presentation/main_scaffold.dart';
+import 'package:cesizen_frontend/shared/widgets/drawer/app_drawer.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,7 +26,7 @@ final goRouterRefreshProvider = Provider<GoRouterRefreshNotifier>(
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/welcome',
+    initialLocation: '/home',
     refreshListenable: ref.watch(goRouterRefreshProvider),
 
     redirect: (context, state) {
@@ -43,6 +47,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/search',
         '/activities',
         '/profile',
+        '/activity/create'
       };
 
       if (isLoading) return null;
@@ -57,7 +62,14 @@ final routerProvider = Provider<GoRouter>((ref) {
 
     routes: [
       ShellRoute(
-        builder: (context, state, child) => MainScaffold(child: child),
+        builder: (context, state, child) {
+          final location = GoRouterState.of(context).uri.toString();
+          final showDrawer = location.startsWith('/activities');
+          return MainScaffold(
+            drawer: showDrawer ? const MyAppDrawer() : null,
+            child: child,
+          );
+        },
         routes: [
           GoRoute(path: '/home', builder: (context, state) => const HomePage()),
           GoRoute(path: '/search', builder: (context, state) => const SearchPage()),
@@ -69,6 +81,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/unboarding', builder: (_, _) => const UnboardingPage()),
       GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterPage()),
+      GoRoute(path: '/activity/create', builder: (_, _) => const ActivityCreatePage()),
+      GoRoute(
+        path: '/activity/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return ActivityDetailPage(activityId: id);
+        },
+      ),
       GoRoute(path: '/debug', builder: (_, _) => const DebugPage()),
     ],
   );

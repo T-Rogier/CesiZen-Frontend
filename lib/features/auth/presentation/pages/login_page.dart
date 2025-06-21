@@ -43,7 +43,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Text("Me connecter", style: AppTextStyles.title),
+                child: Text("Me connecter", style: AppTextStyles.headline),
               ),
               const SizedBox(height: 32),
 

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
+import 'package:go_router/go_router.dart';
 
 class ActivityCard extends StatelessWidget {
+  final String id;
   final String title;
   final String subtitle;
   final String imageUrl;
   final int participationCount;
-  final VoidCallback onPressed;
 
   const ActivityCard({
     super.key,
+    required this.id,
     required this.title,
     required this.subtitle,
     required this.imageUrl,
     required this.participationCount,
-    required this.onPressed,
   });
 
   @override
@@ -35,7 +36,7 @@ class ActivityCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.title.copyWith(fontSize: 18),
+                    style: AppTextStyles.headline.copyWith(fontSize: 18),
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
@@ -57,7 +58,9 @@ class ActivityCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
-                    onPressed: onPressed,
+                    onPressed: () {
+                      context.push('/activity/$id');
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.greenFill,
                       shape: RoundedRectangleBorder(

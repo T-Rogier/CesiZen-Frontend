@@ -11,15 +11,33 @@ class AppColors {
 }
 
 class AppTextStyles {
-  static const title = TextStyle(
+  static const headline = TextStyle(
     fontSize: 24,
     fontWeight: FontWeight.bold,
+    color: AppColors.black,
+  );
+
+  static const TextStyle title = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
     color: AppColors.black,
   );
 
   static const subtitle = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,
+    color: AppColors.black,
+  );
+
+  static const TextStyle body = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+    color: AppColors.black,
+  );
+
+  static const TextStyle caption = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
     color: AppColors.black,
   );
 

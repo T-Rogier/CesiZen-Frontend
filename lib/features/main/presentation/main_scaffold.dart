@@ -5,23 +5,35 @@ import 'package:go_router/go_router.dart';
 
 class MainScaffold extends StatelessWidget {
   final Widget child;
+  final Widget? drawer;
 
-  const MainScaffold({super.key, required this.child});
+  const MainScaffold({super.key, required this.child, this.drawer,});
 
   @override
   Widget build(BuildContext context) {
-    final currentIndex = _calculateIndex(context);
+    final location = GoRouterState.of(context).uri.toString();
+    final currentIndex = _calculateIndex(location);
+    final canPop = context.canPop();
 
     return Scaffold(
+      drawer: drawer,
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: AppColors.greenFill,
         elevation: 0,
         title: Text(
           _getTitle(currentIndex),
-          style: AppTextStyles.title,
+          style: AppTextStyles.headline,
         ),
-        leading: Navigator.of(context).canPop()
+        leading: drawer != null
+            ?
+        Builder(
+          builder: (ctx) => IconButton(
+            icon: const Icon(Icons.menu, color: AppColors.black),
+            onPressed: () => Scaffold.of(ctx).openDrawer(),
+          ),
+        )
+            : canPop
             ? const BackButton(color: AppColors.black)
             : null,
       ),
@@ -30,8 +42,7 @@ class MainScaffold extends StatelessWidget {
     );
   }
 
-  int _calculateIndex(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
+  int _calculateIndex(String location) {
     if (location.startsWith('/search')) return 1;
     if (location.startsWith('/activities')) return 2;
     if (location.startsWith('/profile')) return 3;

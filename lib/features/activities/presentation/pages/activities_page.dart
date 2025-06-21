@@ -5,6 +5,7 @@ import 'package:cesizen_frontend/features/activities/presentation/widgets/filter
 import 'package:cesizen_frontend/shared/widgets/inputs/app_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ActivitiesPage extends ConsumerStatefulWidget {
   const ActivitiesPage({super.key});
@@ -24,11 +25,50 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Écoute de l'état AsyncValue<ActivityState>
     final asyncState = ref.watch(activityProvider);
-    debugPrint('🔄 ActivitiesPage.build – query="$searchQuery", _showFilters=$_showFilters');
 
     return Scaffold(
+      drawer: Drawer(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const DrawerHeader(
+                decoration: BoxDecoration(color: AppColors.greenFill),
+                child: Text(
+                  'Menu',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: AppColors.greenFont,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.add, color: AppColors.greenFont),
+                title: const Text('Créer une activité'),
+                onTap: () {
+                  // ferme le drawer
+                  Navigator.of(context).pop();
+                  // navigue vers la page de création
+                  context.push('/activity/create');
+                  // ou : Navigator.of(context).push(
+                  //  MaterialPageRoute(builder: (_) => const ActivityCreatePage())
+                  // );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.category, color: AppColors.greenFont),
+                title: const Text('Créer une catégorie'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  context.push('/category/create');
+                },
+              ),
+              // ajoute autant de ListTile que nécessaire…
+            ],
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -90,13 +130,11 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
                     itemBuilder: (_, i) {
                       final act = list[i];
                       return ActivityCard(
+                        id: act.id,
                         title: act.title,
                         subtitle: act.estimatedDuration,
                         imageUrl: act.thumbnailImageLink,
                         participationCount: act.viewCount,
-                        onPressed: () {
-                          // TODO: naviguer vers le détail
-                        },
                       );
                     },
                   );

@@ -54,7 +54,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(child: Text("Créer un compte", style: AppTextStyles.title)),
+              Center(child: Text("Créer un compte", style: AppTextStyles.headline)),
               const SizedBox(height: 32),
 
               AppTextInput(

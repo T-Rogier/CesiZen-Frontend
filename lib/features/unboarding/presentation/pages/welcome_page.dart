@@ -20,7 +20,7 @@ class WelcomePage extends StatelessWidget {
               const SizedBox(height: 100),
               const Text(
                 'Bienvenue sur CesiZen',
-                style: AppTextStyles.title
+                style: AppTextStyles.headline
               ),
               const SizedBox(height: 12),
               const Text(
