@@ -18,37 +18,80 @@ class ActivityNotifier extends AsyncNotifier<ActivityState> {
 
   @override
   Future<ActivityState> build() async {
-    debugPrint('🔧 ActivityNotifier.build()');
     _repository = ref.read(activityRepositoryProvider);
 
-    final list = await _repository.fetchActivities();
-    return ActivityState.initial().copyWith(activities: list);
+    final paged = await _repository.fetchActivities();
+    return ActivityState.initial().copyWith(
+      activities: paged.items,
+      pageNumber: paged.pageNumber,
+      totalPages: paged.totalPages,
+    );
   }
 
   Future<void> searchActivities({
     String? query,
-    String? selectedType,
-    String? selectedDuration,
-    List<String>? selectedTags
+    String? type,
+    Duration? startDuration,
+    Duration? endDuration,
+    List<String>? categories,
   }) async {
     state = const AsyncValue.loading();
     try {
-      final activities = await _repository.fetchActivities(
-        query: query ?? state.value?.query ?? '',
+      final paged = await _repository.fetchActivities(
+        query: query,
+        type: type,
+        startEstimatedDuration: startDuration,
+        endEstimatedDuration: endDuration,
+        categories: categories,
       );
-      debugPrint('✅ fetchActivities returned ${activities.length} items');
-
       state = AsyncValue.data(
-        state.value!.copyWith(
-          activities: activities,
-          query: query ?? state.value!.query,
-          selectedType: selectedType ?? state.value!.selectedType,
-          selectedDuration: selectedDuration ?? state.value!.selectedDuration,
-          selectedTags: selectedTags ?? state.value!.selectedTags,
+        ActivityState.initial().copyWith(
+          activities: paged.items,
+          query: query,
+          selectedType: type,
+          startDuration: startDuration,
+          endDuration: endDuration,
+          selectedCategories: categories ?? const [],
+          pageNumber: paged.pageNumber,
+          totalPages: paged.totalPages,
         ),
       );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> loadMore() async {
+    final current = state.value;
+    if (current == null || !current.hasMore || current.isLoadingMore) return;
+
+    state = AsyncValue.data(current.copyWith(isLoadingMore: true));
+
+    try {
+      final nextPage = current.pageNumber + 1;
+      final paged = await _repository.fetchActivities(
+        query: current.query,
+        type: current.selectedType,
+        startEstimatedDuration: current.startDuration,
+        endEstimatedDuration: current.endDuration,
+        categories: current.selectedCategories,
+        pageNumber: nextPage,
+      );
+
+      final combined = [
+        ...current.activities,
+        ...paged.items,
+      ];
+      state = AsyncValue.data(
+        current.copyWith(
+          activities: combined,
+          pageNumber: paged.pageNumber,
+          totalPages: paged.totalPages,
+          isLoadingMore: false,
+        ),
+      );
+    } catch (e, st) {
+      state = AsyncValue.data(current.copyWith(isLoadingMore: false));
     }
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
 import 'package:cesizen_frontend/features/activities/presentation/providers/activity_provider.dart';
 import 'package:cesizen_frontend/features/activities/presentation/widgets/activity_card.dart';
@@ -17,10 +19,37 @@ class ActivitiesPage extends ConsumerStatefulWidget {
 class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
   bool _showFilters = false;
   String searchQuery = '';
+  final _scrollCtrl = ScrollController();
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
+    _scrollCtrl.addListener(() {
+      if (_scrollCtrl.position.pixels >=
+          _scrollCtrl.position.maxScrollExtent - 100) {
+        ref.read(activityProvider.notifier).loadMore();
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(activityProvider.notifier).loadMore();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String val) {
+    setState(() => searchQuery = val);
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      ref.read(activityProvider.notifier).searchActivities(query: searchQuery);
+    });
   }
 
   @override
@@ -28,47 +57,6 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
     final asyncState = ref.watch(activityProvider);
 
     return Scaffold(
-      drawer: Drawer(
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(color: AppColors.greenFill),
-                child: Text(
-                  'Menu',
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: AppColors.greenFont,
-                  ),
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.add, color: AppColors.greenFont),
-                title: const Text('Créer une activité'),
-                onTap: () {
-                  // ferme le drawer
-                  Navigator.of(context).pop();
-                  // navigue vers la page de création
-                  context.push('/activity/create');
-                  // ou : Navigator.of(context).push(
-                  //  MaterialPageRoute(builder: (_) => const ActivityCreatePage())
-                  // );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.category, color: AppColors.greenFont),
-                title: const Text('Créer une catégorie'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  context.push('/category/create');
-                },
-              ),
-              // ajoute autant de ListTile que nécessaire…
-            ],
-          ),
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -79,15 +67,7 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
                   child: AppSearchBar(
                     hintText: 'Rechercher une activité...',
                     value: searchQuery,
-                    onChanged: (val) {
-                      debugPrint('✏️ AppSearchBar.onChanged: $val');
-                      setState(() => searchQuery = val);
-                      // Lancer la recherche à chaque changement (ou
-                      // tu peux plutôt faire sur onSubmitted si tu préfères)
-                      ref
-                          .read(activityProvider.notifier)
-                          .searchActivities(query: searchQuery);
-                    },
+                    onChanged: _onSearchChanged,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -110,31 +90,86 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
               ],
             ),
             const SizedBox(height: 16),
-            if (_showFilters)
-              FiltersDropdown(
-                isVisible: _showFilters,
-                onToggle: () => setState(() => _showFilters = !_showFilters),
+            asyncState.when(
+              loading: () => const Expanded(
+                child: Center(child: Text('')),
               ),
+              error: (e, _) => Expanded(child: Center(child: Text('Erreur : $e'))),
+              data: (state) {
+                return Column( children: [
+                  if (_showFilters)
+                    FiltersDropdown(
+                      isVisible: _showFilters,
+                      onToggle: () => setState(() => _showFilters = !_showFilters),
+                      selectedType: state.selectedType,
+                      startDuration: state.startDuration,
+                      endDuration:   state.endDuration,
+                      selectedCategories: state.selectedCategories,
+
+                      onTypeChanged: (type) {
+                        ref.read(activityProvider.notifier).searchActivities(
+                          query: searchQuery,
+                          type: type,
+                          startDuration: state.startDuration,
+                          endDuration: state.endDuration,
+                          categories: state.selectedCategories,
+                        );
+                      },
+                      onDurationChanged: (sd, ed) {
+                        ref.read(activityProvider.notifier).searchActivities(
+                          query: searchQuery,
+                          type: state.selectedType,
+                          startDuration: sd,
+                          endDuration: ed,
+                          categories: state.selectedCategories,
+                        );
+                      },
+                      onCategoriesChanged: (cats) {
+                        ref.read(activityProvider.notifier).searchActivities(
+                          query: searchQuery,
+                          type: state.selectedType,
+                          startDuration: state.startDuration,
+                          endDuration: state.endDuration,
+                          categories: cats,
+                        );
+                      },
+                    ),
+                ],);
+              },
+            ),
             const SizedBox(height: 12),
             Expanded(
               child: asyncState.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, st) => Center(child: Text('Erreur: $err')),
-                data: (state) {
-                  final list = state.activities;
-                  if (list.isEmpty) {
-                    return const Center(child: Text('Aucune activité trouvée'));
+                error:   (e,_) => Center(child: Text('Erreur : $e')),
+                data:    (state) {
+                  if (state.activities.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'Aucune activité trouvée',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    );
                   }
+                  // Sinon on construit la liste paginée
                   return ListView.builder(
-                    itemCount: list.length,
-                    itemBuilder: (_, i) {
-                      final act = list[i];
-                      return ActivityCard(
-                        id: act.id,
-                        title: act.title,
-                        subtitle: act.estimatedDuration,
-                        imageUrl: act.thumbnailImageLink,
-                        participationCount: act.viewCount,
+                    controller: _scrollCtrl,
+                    itemCount: state.activities.length + (state.hasMore ? 1 : 0),
+                    itemBuilder: (context, i) {
+                      if (i < state.activities.length) {
+                        final act = state.activities[i];
+                        return ActivityCard(
+                          id: act.id,
+                          title: act.title,
+                          subtitle: act.estimatedDuration,
+                          imageUrl: act.thumbnailImageLink,
+                          participationCount: act.viewCount,
+                        );
+                      }
+                      // loader en bas pour la pagination
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(child: CircularProgressIndicator()),
                       );
                     },
                   );

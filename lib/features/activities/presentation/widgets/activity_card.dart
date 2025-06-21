@@ -82,11 +82,20 @@ class ActivityCard extends StatelessWidget {
             // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                imageUrl,
+              child: FadeInImage.assetNetwork(
+                placeholder: 'assets/images/exercices.png',
+                image: imageUrl,
                 width: 72,
                 height: 72,
                 fit: BoxFit.cover,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/exercices.png',
+                    width: 72,
+                    height: 72,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
             ),
           ],
