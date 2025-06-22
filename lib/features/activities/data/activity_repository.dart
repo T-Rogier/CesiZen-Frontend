@@ -46,7 +46,7 @@ class ActivityRepository {
     final response = await dio.get(url.toString());
 
     final json = response.data as Map<String, dynamic>;
-    return PaginatedResponse.fromJson(json, (e) => Activity.fromJson(e));
+    return PaginatedResponse.fromJson(json, (e) => Activity.fromJson(e), 'activities');
   }
 
   Future<FullActivity> fetchActivityById(String id) async {

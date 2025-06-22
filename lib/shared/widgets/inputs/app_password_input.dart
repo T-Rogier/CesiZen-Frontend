@@ -42,9 +42,13 @@ class _AppPasswordInputState extends State<AppPasswordInput> {
               ),
               onPressed: () => setState(() => _obscure = !_obscure),
             ),
-            border: OutlineInputBorder(
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.transparent),
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: AppColors.greenFont, width: 2),
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),

@@ -6,12 +6,10 @@ import 'package:cesizen_frontend/shared/widgets/inputs/app_quill_editor.dart';
 import 'package:cesizen_frontend/features/activities/domain/create_activity_request.dart';
 import 'package:cesizen_frontend/features/activities/presentation/providers/providers.dart';
 import 'package:cesizen_frontend/features/activities/presentation/widgets/custom_filter_chip.dart';
-import 'package:cesizen_frontend/features/categories/presentation/category_provider.dart';
-import 'package:flutter/foundation.dart';
+import 'package:cesizen_frontend/features/categories/presentation/providers/category_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path/path.dart' as path;
 
 class ActivityCreatePage extends ConsumerStatefulWidget {
   const ActivityCreatePage({super.key});

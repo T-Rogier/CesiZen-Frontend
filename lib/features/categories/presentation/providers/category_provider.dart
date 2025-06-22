@@ -10,3 +10,8 @@ final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
 final categoriesProvider = FutureProvider<List<Category>>((ref) {
   return ref.watch(categoryRepositoryProvider).fetchCategories();
 });
+
+final categoryDetailProvider = FutureProvider.family<Category, String>((ref, id) {
+  final repo = ref.watch(categoryRepositoryProvider);
+  return repo.fetchCategoryById(id);
+});

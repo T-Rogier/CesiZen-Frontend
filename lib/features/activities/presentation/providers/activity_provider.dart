@@ -1,6 +1,4 @@
 import 'package:cesizen_frontend/core/network/dio_client.dart';
-import 'package:cesizen_frontend/features/activities/domain/full_activity.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cesizen_frontend/features/activities/data/activity_repository.dart';
 import 'package:cesizen_frontend/features/activities/domain/activity_state.dart';

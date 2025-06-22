@@ -14,7 +14,7 @@ class MyAppDrawer extends StatelessWidget {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(color: AppColors.greenFill),
-              child: Text('Menu', style: TextStyle(fontSize: 24, color: AppColors.greenFont)),
+              child: Text('Administration', style: TextStyle(fontSize: 24, color: AppColors.greenFont)),
             ),
             ListTile(
               leading: const Icon(Icons.add, color: AppColors.greenFont),
@@ -26,6 +26,14 @@ class MyAppDrawer extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.category, color: AppColors.greenFont),
+              title: const Text('Lister les catégories'),
+              onTap: () {
+                context.pop();
+                context.push('/categories');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.add, color: AppColors.greenFont),
               title: const Text('Créer une catégorie'),
               onTap: () {
                 context.pop();

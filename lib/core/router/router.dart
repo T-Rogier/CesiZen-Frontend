@@ -1,6 +1,8 @@
 import 'package:cesizen_frontend/features/activities/presentation/pages/activity_create_page.dart';
 import 'package:cesizen_frontend/features/activities/presentation/pages/activity_detail_page.dart';
 import 'package:cesizen_frontend/features/auth/presentation/providers/go_router_refresh_notifier.dart';
+import 'package:cesizen_frontend/features/categories/presentation/pages/categories_page.dart';
+import 'package:cesizen_frontend/features/categories/presentation/pages/category_form_page.dart';
 import 'package:cesizen_frontend/features/debug/presentation/pages/debug_page.dart';
 import 'package:cesizen_frontend/features/main/presentation/main_scaffold.dart';
 import 'package:cesizen_frontend/shared/widgets/drawer/app_drawer.dart';
@@ -47,7 +49,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/search',
         '/activities',
         '/profile',
-        '/activity/create'
+        '/activity/create',
+        '/categories',
+        '/category/create'
       };
 
       if (isLoading) return null;
@@ -87,6 +91,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return ActivityDetailPage(activityId: id);
+        },
+      ),
+      GoRoute(path: '/categories', builder: (_, _) => const CategoriesPage()),
+      GoRoute(path: '/category/create', builder: (_, _) => const CategoryFormPage()),
+      GoRoute(
+        path: '/category/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return CategoryFormPage(categoryId: id);
         },
       ),
       GoRoute(path: '/debug', builder: (_, _) => const DebugPage()),

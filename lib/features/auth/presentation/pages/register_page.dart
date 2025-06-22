@@ -5,7 +5,7 @@ import 'package:cesizen_frontend/app/theme/app_theme.dart';
 import 'package:cesizen_frontend/shared/widgets/buttons/app_button.dart';
 import 'package:cesizen_frontend/shared/widgets/app_checkbox_label.dart';
 import 'package:cesizen_frontend/shared/widgets/inputs/app_password_input.dart';
-import 'package:cesizen_frontend/shared/widgets/inputs/app_text_input.dart';
+import 'package:cesizen_frontend/shared/widgets/inputs/app_text_input_labeled.dart';
 import 'package:cesizen_frontend/features/auth/presentation/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -57,14 +57,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
               Center(child: Text("Créer un compte", style: AppTextStyles.headline)),
               const SizedBox(height: 32),
 
-              AppTextInput(
+              AppTextInputLabeled(
                 label: "Votre nom d'utilisateur",
                 hint: "Entrez votre nom d'utilisateur",
                 controller: _usernameController,
               ),
               const SizedBox(height: 20),
 
-              AppTextInput(
+              AppTextInputLabeled(
                 label: "Votre adresse email",
                 hint: "Entrez votre adresse email",
                 controller: _emailController,

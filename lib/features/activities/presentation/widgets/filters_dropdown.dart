@@ -1,5 +1,5 @@
 import 'package:cesizen_frontend/features/activities/presentation/providers/activity_type_provider.dart';
-import 'package:cesizen_frontend/features/categories/presentation/category_provider.dart';
+import 'package:cesizen_frontend/features/categories/presentation/providers/category_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cesizen_frontend/features/activities/presentation/widgets/custom_filter_chip.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -137,10 +137,10 @@ class _FiltersDropdownState extends ConsumerState<FiltersDropdown> {
           catsAsync.when(
             loading: () => const CircularProgressIndicator(),
             error: (e, _) => Text('Erreur catégories : $e'),
-            data: (allCategories) => Wrap(
+            data: (cats) => Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: allCategories.map((cat) {
+              children: cats.map((cat) {
                 final selected = widget
                     .selectedCategories
                     .contains(cat.name);
