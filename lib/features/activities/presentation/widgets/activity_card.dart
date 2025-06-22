@@ -40,21 +40,21 @@ class ActivityCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: AppTextStyles.subtitle.copyWith(
-                      color: AppColors.greenFont,
-                      fontSize: 14,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '$participationCount participations',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        subtitle,
+                        style: AppTextStyles.subtitle.copyWith(
+                          color: AppColors.greenFont,
+                          fontSize: 14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(width: 30),
+                      Icon(Icons.visibility, size: 20, color: AppColors.greenFont),
+                      const SizedBox(width: 4),
+                      Text('$participationCount vues', style: AppTextStyles.caption),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(

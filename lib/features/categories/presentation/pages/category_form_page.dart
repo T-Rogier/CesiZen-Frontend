@@ -2,7 +2,7 @@ import 'package:cesizen_frontend/app/theme/app_theme.dart';
 import 'package:cesizen_frontend/features/categories/domain/category.dart';
 import 'package:cesizen_frontend/features/categories/domain/category_request.dart';
 import 'package:cesizen_frontend/features/categories/presentation/providers/category_notifier.dart';
-import 'package:cesizen_frontend/features/categories/presentation/providers/category_provider.dart' hide categoryRepositoryProvider;
+import 'package:cesizen_frontend/features/categories/presentation/providers/category_provider.dart';
 import 'package:cesizen_frontend/shared/widgets/inputs/app_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +36,7 @@ class CategoryFormPage extends ConsumerWidget {
 
 class _CategoryFormBody extends ConsumerStatefulWidget {
   final Category? category;
-  const _CategoryFormBody({super.key, this.category});
+  const _CategoryFormBody({this.category});
 
   @override
   ConsumerState<_CategoryFormBody> createState() => _CategoryFormBodyState();

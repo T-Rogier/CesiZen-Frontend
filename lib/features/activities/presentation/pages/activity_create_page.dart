@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io' as io show Directory, File;
 
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
 import 'package:cesizen_frontend/shared/widgets/inputs/app_quill_editor.dart';

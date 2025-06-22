@@ -1,4 +1,4 @@
-import 'package:cesizen_frontend/core/network/dio_client.dart';
+import 'package:cesizen_frontend/core/network/dio_provider.dart';
 import 'package:cesizen_frontend/features/auth/domain/auth_session.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cesizen_frontend/features/auth/data/auth_repository.dart';
@@ -6,7 +6,8 @@ import 'package:cesizen_frontend/features/auth/domain/auth_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepository(DioClient.create());
+  final dio = ref.watch(dioProvider);
+  return AuthRepository(dio);
 });
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, AuthState>(
@@ -60,5 +61,15 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     state = const AsyncValue.loading();
     await _repository.logout();
     state = const AsyncValue.data(AuthState.unauthenticated());
+  }
+
+  Future<void> refreshSessionFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    try {
+      final session = AuthSession.fromPrefs(prefs);
+      state = AsyncValue.data(AuthState.authenticated(session));
+    } catch (_) {
+      state = const AsyncValue.data(AuthState.unauthenticated());
+    }
   }
 }

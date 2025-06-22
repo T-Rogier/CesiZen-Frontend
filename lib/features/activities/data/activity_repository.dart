@@ -1,8 +1,8 @@
 import 'package:cesizen_frontend/core/domain/paginated_response.dart';
+import 'package:cesizen_frontend/features/activities/domain/SaveActivityRequest.dart';
 import 'package:cesizen_frontend/features/activities/domain/create_activity_request.dart';
 import 'package:cesizen_frontend/features/activities/domain/full_activity.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import '../domain/activity.dart';
 
 class ActivityRepository {
@@ -19,10 +19,8 @@ class ActivityRepository {
     int pageNumber = 1,
     int pageSize = 10,
   }) async {
-    String fmt(Duration? d) =>
-        d == null ? '' : d.toString().split('.').first.padLeft(8, '0');
-    final start = fmt(startEstimatedDuration);
-    final end   = fmt(endEstimatedDuration);
+    final start = _formatDuration(startEstimatedDuration);
+    final end   = _formatDuration(endEstimatedDuration);
 
     final title    = query ?? '';
     final typeParam = type == null || type == 'all' ? '' : type;
@@ -49,6 +47,27 @@ class ActivityRepository {
     return PaginatedResponse.fromJson(json, (e) => Activity.fromJson(e), 'activities');
   }
 
+  Future<PaginatedResponse<Activity>> fetchActivitiesByState({
+    required String state,
+    int pageNumber = 1,
+    int pageSize = 10,
+  }) async {
+    final response = await dio.get('/activities/byState?State=$state&PageNumber=$pageNumber&PageSize=$pageSize');
+
+    final json = response.data as Map<String, dynamic>;
+    return PaginatedResponse.fromJson(json, (e) => Activity.fromJson(e), 'activities');
+  }
+
+  Future<PaginatedResponse<Activity>> fetchFavoriteActivities({
+    int pageNumber = 1,
+    int pageSize = 10,
+  }) async {
+    final response = await dio.get('/activities/favorite');
+
+    final json = response.data as Map<String, dynamic>;
+    return PaginatedResponse.fromJson(json, (e) => Activity.fromJson(e), 'activities');
+  }
+
   Future<FullActivity> fetchActivityById(String id) async {
     final response = await dio.get('/activities/$id');
     return FullActivity.fromJson(response.data as Map<String, dynamic>);
@@ -70,8 +89,25 @@ class ActivityRepository {
     return FullActivity.fromJson(response.data as Map<String, dynamic>);
   }
 
-  String _formatDuration(Duration d) {
+  Future<void> saveActivity({
+    required String activityId,
+    required bool isFavoris,
+    required String state,
+    required double progress,
+  }) async {
+    final dto = SaveActivityRequest(
+      isFavoris: isFavoris,
+      state: state,
+      progress: progress,
+    );
+    await dio.post(
+      '/activities/save/$activityId',
+      data: dto.toJson(),
+    );
+  }
+
+  String _formatDuration(Duration? d) {
     twoDigits(int n) => n.toString().padLeft(2, '0');
-    return '${twoDigits(d.inHours)}:${twoDigits(d.inMinutes % 60)}:00';
+    return d == null ? '' : '${twoDigits(d.inHours)}:${twoDigits(d.inMinutes % 60)}:00';
   }
 }

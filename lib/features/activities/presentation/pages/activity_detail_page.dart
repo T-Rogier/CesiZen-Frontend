@@ -1,4 +1,5 @@
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
+import 'package:cesizen_frontend/features/activities/domain/full_activity.dart';
 import 'package:cesizen_frontend/features/activities/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ActivityDetailPage extends ConsumerWidget {
   final String activityId;
   const ActivityDetailPage({super.key, required this.activityId});
+
+  String _buttonLabel(FullActivity activity) {
+    if (activity.state == 'Non commencé' || activity.state == null) {
+      return 'Commencer';
+    }
+    else if (activity.state == 'En cours') {
+      return 'Continuer';
+    }
+    else {
+      return 'Recommencer';
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,6 +56,11 @@ class ActivityDetailPage extends ConsumerWidget {
                 Text(
                   act.title,
                   style: AppTextStyles.headline.copyWith(fontSize: 24),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Créé par : ${act.createdBy}',
+                  style: AppTextStyles.subtitle.copyWith(fontSize: 14, fontStyle: FontStyle.italic),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -105,7 +123,7 @@ class ActivityDetailPage extends ConsumerWidget {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: Text('Commencer',
+                        child: Text(_buttonLabel(act),
                             style: AppTextStyles.button.copyWith(
                                 color: AppColors.black)),
                       ),
@@ -114,10 +132,10 @@ class ActivityDetailPage extends ConsumerWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: ajouter aux favoris
+                          ref.read(activityDetailProvider(activityId).notifier).toggleFavorite();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.greenFill.withOpacity(0.2),
+                          backgroundColor: AppColors.greenFill,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
                           ),
@@ -126,7 +144,9 @@ class ActivityDetailPage extends ConsumerWidget {
                         child: Text(
                           act.isFavoris ?? false ? 'En favoris' : 'Ajouter aux favoris',
                           style:
-                          AppTextStyles.button.copyWith(color: AppColors.greenFont),
+                          AppTextStyles.button.copyWith(
+                              color: act.isFavoris ?? false ? AppColors.greenFont : AppColors.black
+                          ),
                         ),
                       ),
                     ),

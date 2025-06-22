@@ -1,16 +1,17 @@
+import 'package:cesizen_frontend/core/network/dio_provider.dart';
 import 'package:cesizen_frontend/features/categories/domain/category_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cesizen_frontend/core/network/dio_client.dart';
 import 'package:cesizen_frontend/features/categories/data/category_repository.dart';
 
 final categoryRepositoryProvider = Provider<CategoryRepository>((ref) {
-  return CategoryRepository(DioClient.create());
+  final dio = ref.watch(dioProvider);
+  return CategoryRepository(dio);
 });
 
 final categoryProvider =
-AsyncNotifierProvider<CategoryNotifier, CategoryState>(CategoryNotifier.new);
+AsyncNotifierProvider.autoDispose<CategoryNotifier, CategoryState>(CategoryNotifier.new);
 
-class CategoryNotifier extends AsyncNotifier<CategoryState> {
+class CategoryNotifier extends AutoDisposeAsyncNotifier<CategoryState> {
   late final CategoryRepository _repo;
 
   @override

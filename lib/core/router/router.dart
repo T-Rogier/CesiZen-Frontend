@@ -6,7 +6,6 @@ import 'package:cesizen_frontend/features/categories/presentation/pages/category
 import 'package:cesizen_frontend/features/debug/presentation/pages/debug_page.dart';
 import 'package:cesizen_frontend/features/main/presentation/main_scaffold.dart';
 import 'package:cesizen_frontend/shared/widgets/drawer/app_drawer.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -44,13 +43,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/welcome',
         '/unboarding',
         '/debug',
-        '/home',
         '/search',
         '/activities',
-        '/user',
-        '/activity/create',
-        '/categories',
-        '/category/create'
       };
 
       if (isLoading) return null;

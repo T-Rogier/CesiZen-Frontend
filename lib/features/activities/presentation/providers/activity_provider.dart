@@ -1,17 +1,17 @@
-import 'package:cesizen_frontend/core/network/dio_client.dart';
+import 'package:cesizen_frontend/core/network/dio_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cesizen_frontend/features/activities/data/activity_repository.dart';
 import 'package:cesizen_frontend/features/activities/domain/activity_state.dart';
 
 final activityRepositoryProvider = Provider<ActivityRepository>((ref) {
-  final dio = DioClient.create();
+  final dio = ref.watch(dioProvider);
   return ActivityRepository(dio);
 });
 
 final activityProvider =
-AsyncNotifierProvider<ActivityNotifier, ActivityState>(() => ActivityNotifier());
+AsyncNotifierProvider.autoDispose<ActivityNotifier, ActivityState>(() => ActivityNotifier());
 
-class ActivityNotifier extends AsyncNotifier<ActivityState> {
+class ActivityNotifier extends AutoDisposeAsyncNotifier<ActivityState> {
   late final ActivityRepository _repository;
 
   @override
@@ -88,7 +88,7 @@ class ActivityNotifier extends AsyncNotifier<ActivityState> {
           isLoadingMore: false,
         ),
       );
-    } catch (e, st) {
+    } catch (e) {
       state = AsyncValue.data(current.copyWith(isLoadingMore: false));
     }
   }

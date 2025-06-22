@@ -27,4 +27,11 @@ class PaginatedResponse<T> {
       totalPages:(json['totalPages'] as num).toInt(),
     );
   }
+
+  const PaginatedResponse.empty()
+      : items = const [],
+        pageNumber = 1,
+        pageSize = 0,
+        totalCount = 0,
+        totalPages = 0;
 }

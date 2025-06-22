@@ -1,5 +1,5 @@
+import 'package:cesizen_frontend/core/network/dio_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cesizen_frontend/core/network/dio_client.dart';
 import 'package:cesizen_frontend/features/user/data/user_repository.dart';
 import 'package:cesizen_frontend/features/user/domain/user.dart';
 import 'package:cesizen_frontend/core/domain/paginated_response.dart';
@@ -8,7 +8,7 @@ import 'package:cesizen_frontend/features/user/domain/create_user_request.dart';
 import 'domain/user_filter_request.dart';
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
-  final dio = DioClient.create();
+  final dio = ref.watch(dioProvider);
   return UserRepository(dio);
 });
 

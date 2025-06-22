@@ -36,6 +36,15 @@ class FullActivity {
   });
 
   factory FullActivity.fromJson(Map<String, dynamic> json) {
+
+    final rawProg = json['progress']?.toString() ?? '0%';
+    double progValue;
+    try {
+      progValue = double.parse(rawProg.replaceAll('%', ''));
+    } catch (_) {
+      progValue = 0.0;
+    }
+
     return FullActivity(
       id: json['id'].toString(),
       title: json['title'] as String? ?? '',
@@ -55,7 +64,47 @@ class FullActivity {
       type: json['type'] as String? ?? '',
       isFavoris: json['isFavoris'] as bool?,
       state: json['state'] as String?,
-      progress: (json['progress'] as num?)?.toDouble(),
+      progress: progValue,
+    );
+  }
+
+  FullActivity copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? content,
+    String? thumbnailImageLink,
+    String? estimatedDuration,
+    int? viewCount,
+    bool? activated,
+    bool? deleted,
+    int? createdById,
+    String? createdBy,
+    List<String>? categories,
+    String? type,
+    bool? isFavoris,
+    String? state,
+    double? progress,
+  }) {
+    return FullActivity(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      content: content ?? this.content,
+      thumbnailImageLink: thumbnailImageLink ?? this.thumbnailImageLink,
+      estimatedDuration: estimatedDuration ?? this.estimatedDuration,
+      viewCount: viewCount ?? this.viewCount,
+      activated: activated ?? this.activated,
+      deleted: deleted ?? this.deleted,
+      createdById: createdById ?? this.createdById,
+      createdBy: createdBy ?? this.createdBy,
+      categories: categories ?? this.categories,
+      type: type ?? this.type,
+      isFavoris: isFavoris ?? this.isFavoris,
+      state: state ?? this.state,
+      progress: progress ?? this.progress,
     );
   }
 }
+
+
