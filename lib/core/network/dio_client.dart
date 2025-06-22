@@ -20,6 +20,36 @@ class DioClient {
         }
         handler.next(options);
       },
+      onError: (DioException err, handler) async {
+        if (err.response?.statusCode == 401) {
+          final prefs = await SharedPreferences.getInstance();
+          final refreshToken = prefs.getString('refresh_token');
+          if (refreshToken != null) {
+            try {
+              final refreshDio = Dio(BaseOptions(baseUrl: dio.options.baseUrl));
+              final resp = await refreshDio.post(
+                '/auth/refresh',
+                data: {'refreshToken': refreshToken},
+              );
+              final newAccess = resp.data['accessToken'] as String;
+              final newRefresh = resp.data['refreshToken'] as String;
+
+              await prefs.setString('access_token', newAccess);
+              await prefs.setString('refresh_token', newRefresh);
+
+              final opts = err.requestOptions;
+              opts.headers['Authorization'] = 'Bearer $newAccess';
+
+              final cloneReq = await dio.fetch(opts);
+              return handler.resolve(cloneReq);
+            } catch (e) {
+              debugPrint('[DioClient] refresh failed: $e');
+              await prefs.clear();
+            }
+          }
+        }
+        handler.next(err);
+      },
     ));
 
     dio.interceptors.add(

@@ -57,8 +57,26 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
+    try {
+      await _dio.post('/auth/logout');
+    } catch (e) {
+      debugPrint('[AuthRepository] logout failed: $e');
+    }
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('access_token');
+    await prefs.remove('refresh_token');
+    await prefs.remove('username');
+    await prefs.remove('role');
+  }
+
+  Future<void> deleteMyProfile() async {
+    try {
+      await _dio.delete('/users/me');
+    } catch (e) {
+      debugPrint('[AuthRepository] deleteAccount failed: $e');
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 
   Future<bool> isLoggedIn() async {

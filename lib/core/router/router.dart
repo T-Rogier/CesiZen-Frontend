@@ -20,7 +20,7 @@ import 'package:cesizen_frontend/features/auth/presentation/pages/register_page.
 import 'package:cesizen_frontend/features/home/presentation/pages/home_page.dart';
 import 'package:cesizen_frontend/features/search/presentation/pages/search_page.dart';
 import 'package:cesizen_frontend/features/activities/presentation/pages/activities_page.dart';
-import 'package:cesizen_frontend/features/profile/presentation/pages/profile_page.dart';
+import 'package:cesizen_frontend/features/user/presentation/pages/profile_page.dart';
 
 final goRouterRefreshProvider = Provider<GoRouterRefreshNotifier>(
       (ref) => GoRouterRefreshNotifier(ref),
@@ -34,8 +34,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final auth = ref.read(authProvider);
 
-      final isLoggedIn = auth.value?.status == AuthStatus.authenticated &&
-          auth.value?.isTokenValid == true;
+      final isLoggedIn = auth.value?.status == AuthStatus.authenticated;
       final isLoading = auth.isLoading;
       final location = state.matchedLocation;
 
@@ -48,7 +47,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/home',
         '/search',
         '/activities',
-        '/profile',
+        '/user',
         '/activity/create',
         '/categories',
         '/category/create'

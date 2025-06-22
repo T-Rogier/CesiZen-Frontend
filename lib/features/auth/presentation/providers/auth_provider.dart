@@ -1,3 +1,4 @@
+import 'package:cesizen_frontend/core/network/dio_client.dart';
 import 'package:cesizen_frontend/features/auth/domain/auth_session.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cesizen_frontend/features/auth/data/auth_repository.dart';
@@ -5,7 +6,7 @@ import 'package:cesizen_frontend/features/auth/domain/auth_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  throw UnimplementedError();
+  return AuthRepository(DioClient.create());
 });
 
 final authProvider = AsyncNotifierProvider<AuthNotifier, AuthState>(
@@ -49,8 +50,15 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     }
   }
 
+  Future<void> deleteAccount() async {
+    state = const AsyncValue.loading();
+    await _repository.deleteMyProfile();
+    state = const AsyncValue.data(AuthState.unauthenticated());
+  }
+
   Future<void> logout() async {
+    state = const AsyncValue.loading();
     await _repository.logout();
-    state = AsyncValue.data(const AuthState.unauthenticated());
+    state = const AsyncValue.data(AuthState.unauthenticated());
   }
 }
