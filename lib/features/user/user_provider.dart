@@ -12,7 +12,7 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepository(dio);
 });
 
-final usersProvider = FutureProvider.family<PaginatedResponse<User>, UserFilter>(
+final usersProvider = FutureProvider.autoDispose.family<PaginatedResponse<User>, UserFilter>(
       (ref, filter) {
     final repo = ref.watch(userRepositoryProvider);
     return repo.fetchUsers(
@@ -26,24 +26,24 @@ final usersProvider = FutureProvider.family<PaginatedResponse<User>, UserFilter>
   },
 );
 
-final userByIdProvider = FutureProvider.family<User, String>(
+final userByIdProvider = FutureProvider.autoDispose.family<User, String>(
       (ref, userId) {
     final repo = ref.watch(userRepositoryProvider);
     return repo.fetchUserById(userId);
   },
 );
 
-final myProfileProvider = FutureProvider<User>((ref) {
+final myProfileProvider = FutureProvider.autoDispose<User>((ref) {
   final repo = ref.watch(userRepositoryProvider);
   return repo.fetchMyProfile();
 });
 
-final userRolesProvider = FutureProvider<List<String>>((ref) {
+final userRolesProvider = FutureProvider.autoDispose<List<String>>((ref) {
   final repo = ref.watch(userRepositoryProvider);
   return repo.fetchUserRoles();
 });
 
-final createUserProvider = Provider<CreateUserNotifier>((ref) {
+final createUserProvider = Provider.autoDispose<CreateUserNotifier>((ref) {
   final repo = ref.watch(userRepositoryProvider);
   return CreateUserNotifier(repo);
 });

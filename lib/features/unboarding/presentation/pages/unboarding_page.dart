@@ -86,7 +86,7 @@ class UnboardingPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: accès direct sans connexion
+                    context.go('/activities');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.greenFill,

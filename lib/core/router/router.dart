@@ -1,10 +1,14 @@
+import 'package:cesizen_frontend/core/router/routes.dart';
 import 'package:cesizen_frontend/features/activities/presentation/pages/activity_create_page.dart';
 import 'package:cesizen_frontend/features/activities/presentation/pages/activity_detail_page.dart';
 import 'package:cesizen_frontend/features/auth/presentation/providers/go_router_refresh_notifier.dart';
 import 'package:cesizen_frontend/features/categories/presentation/pages/categories_page.dart';
 import 'package:cesizen_frontend/features/categories/presentation/pages/category_form_page.dart';
 import 'package:cesizen_frontend/features/debug/presentation/pages/debug_page.dart';
+import 'package:cesizen_frontend/features/forbidden/presentation/pages/forbidden_page.dart';
+import 'package:cesizen_frontend/features/forbidden/presentation/pages/login_required_page.dart';
 import 'package:cesizen_frontend/features/main/presentation/main_scaffold.dart';
+import 'package:cesizen_frontend/features/user/presentation/pages/profile_page.dart';
 import 'package:cesizen_frontend/shared/widgets/drawer/app_drawer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,7 +23,6 @@ import 'package:cesizen_frontend/features/auth/presentation/pages/register_page.
 import 'package:cesizen_frontend/features/home/presentation/pages/home_page.dart';
 import 'package:cesizen_frontend/features/search/presentation/pages/search_page.dart';
 import 'package:cesizen_frontend/features/activities/presentation/pages/activities_page.dart';
-import 'package:cesizen_frontend/features/user/presentation/pages/profile_page.dart';
 
 final goRouterRefreshProvider = Provider<GoRouterRefreshNotifier>(
       (ref) => GoRouterRefreshNotifier(ref),
@@ -27,44 +30,69 @@ final goRouterRefreshProvider = Provider<GoRouterRefreshNotifier>(
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/welcome',
     refreshListenable: ref.watch(goRouterRefreshProvider),
-
     redirect: (context, state) {
-      final auth = ref.read(authProvider);
-
+      final auth       = ref.read(authProvider);
+      final isLoading  = auth.isLoading;
+      final session    = auth.value?.session;
       final isLoggedIn = auth.value?.status == AuthStatus.authenticated;
-      final isLoading = auth.isLoading;
-      final location = state.matchedLocation;
+      final location   = state.matchedLocation;
 
-      final publicRoutes = {
-        '/login',
-        '/register',
-        '/welcome',
-        '/unboarding',
-        '/debug',
-        '/search',
-        '/activities',
-      };
+      if (isLoading) {
+        return null;
+      }
 
-      if (isLoading) return null;
+      if (publicRoutes.contains(location)) {
+        if (isLoggedIn && (location == '/login' || location == '/register')) {
+          return '/home';
+        }
+        return null;
+      }
 
-      final isPublic = publicRoutes.contains(location);
+      if (!isLoggedIn) {
+        return '/login-required';
+      }
 
-      if (!isLoggedIn && !isPublic) return '/login';
-      if (isLoggedIn && location == '/login') return '/home';
+      final role = session!.role;
+      final allowed = roleAllowed[role]!;
 
-      return null;
+      if (allowed.contains(location)) {
+        return null;
+      }
+
+      final uri      = Uri.parse(location);
+      final segments = uri.pathSegments;
+      if (segments.length == 2) {
+        final base = '/${segments[0]}';
+        final id   = segments[1];
+        final isNum = int.tryParse(id) != null;
+        if (isNum && allowed.contains(base)) {
+          return null;
+        }
+      }
+      return '/forbidden';
     },
-
     routes: [
       ShellRoute(
         builder: (context, state, child) {
-          final location = GoRouterState.of(context).uri.toString();
-          final showDrawer = location.startsWith('/activities');
-          return MainScaffold(
-            drawer: showDrawer ? const MyAppDrawer() : null,
-            child: child,
+          final location   = GoRouterState.of(context).uri.toString();
+          final showOnPath = location.startsWith('/activities');
+
+          return Consumer(
+            builder: (context, ref, _) {
+              final authState = ref.watch(authProvider).value;
+              final role = authState?.session?.role;
+
+              final drawer = showOnPath && role == 'Admin'
+                  ? const MyAppDrawer()
+                  : null;
+
+              return MainScaffold(
+                drawer: drawer,
+                child: child,
+              );
+            },
           );
         },
         routes: [
@@ -96,7 +124,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/debug', builder: (_, _) => const DebugPage()),
+      GoRoute(path: '/forbidden', builder: (_,_) => const ForbiddenPage()),
+      GoRoute(path: '/login-required', builder: (_,_) => const LoginRequiredPage()),
     ],
   );
 });
+
 
