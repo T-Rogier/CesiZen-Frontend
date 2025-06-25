@@ -8,6 +8,7 @@ class AppTextFormField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool obscureText;
   final int? maxLines;
+  final bool isEnabled;
 
   const AppTextFormField({
     super.key,
@@ -17,6 +18,7 @@ class AppTextFormField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
     this.maxLines = 1,
+    this.isEnabled = true,
   });
 
   @override
@@ -25,20 +27,32 @@ class AppTextFormField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
-      maxLines: maxLines,
+      maxLines: obscureText ? 1 : maxLines,
+      enabled: isEnabled,
       decoration: InputDecoration(
-        labelText: labelText,
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.transparent),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.greenFont, width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      ),
-      validator: validator,
+          labelText: labelText,
+          enabledBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.transparent),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.greenFont, width: 2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.black.withOpacity(0.2)),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          fillColor: isEnabled
+                    ? AppColors.greenFill
+                    : AppColors.greenFill.withOpacity(0.3),
+      filled: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+    ),
+    style: AppTextStyles.body.copyWith(
+    color: isEnabled ? AppColors.black : AppColors.black.withOpacity(0.5),
+    ),
+    validator: isEnabled ? validator : null,
     );
   }
 }

@@ -1,13 +1,13 @@
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
-class CustomDropdownFilter<T> extends StatelessWidget {
+class CustomUsersDropdownFilter<T> extends StatelessWidget {
   final String label;
   final T? value;
   final List<DropdownFilterItem<T>> items;
   final ValueChanged<T?> onChanged;
 
-  const CustomDropdownFilter({
+  const CustomUsersDropdownFilter({
     super.key,
     required this.label,
     required this.value,

@@ -24,6 +24,7 @@ const roleAllowed = {
     '/category',
     '/users',
     '/user/create',
+    '/user',
     '/profile',
     '/article',
   },

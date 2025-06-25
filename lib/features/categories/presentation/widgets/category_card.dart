@@ -63,7 +63,7 @@ class CategoryCard extends StatelessWidget {
             width: 48,
             height: 48,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const Icon(Icons.category, size: 48),
+            errorBuilder: (_, _, _) => const Icon(Icons.category, size: 48),
           ),
         ),
         title: Text(

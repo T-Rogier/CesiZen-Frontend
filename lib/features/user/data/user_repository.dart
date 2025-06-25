@@ -1,6 +1,7 @@
 import 'package:cesizen_frontend/core/domain/paginated_response.dart';
-import 'package:cesizen_frontend/features/user/domain/create_user_request.dart';
+import 'package:cesizen_frontend/features/user/domain/user_create_request.dart';
 import 'package:cesizen_frontend/features/user/domain/user.dart';
+import 'package:cesizen_frontend/features/user/domain/user_update_request.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,8 +12,7 @@ class UserRepository {
   UserRepository(this.dio);
 
   Future<PaginatedResponse<User>> fetchUsers({
-    String? username,
-    String? email,
+    String? query,
     bool? disabled,
     String? role,
     int pageNumber = 1,
@@ -21,12 +21,13 @@ class UserRepository {
     final roleParam = role == null || role == 'all' ? '' : role;
 
     final url = StringBuffer('/users/filter?')
-      ..write('Username=$username')
-      ..write('&Email=$email')
-      ..write('&Disabled=$disabled')
+      ..write('Query=$query');
+
+    if (disabled != null) {
+      url.write('&Disabled=$disabled');
+    }
+    url
       ..write('&Role=$roleParam')
-      ..write('&StartDate=')
-      ..write('&EndDate=')
       ..write('&PageNumber=$pageNumber')
       ..write('&PageSize=$pageSize');
 
@@ -49,11 +50,11 @@ class UserRepository {
   Future<List<String>> fetchUserRoles() async {
     final response = await dio.get('/users/role');
     final Map<String, dynamic> json = response.data as Map<String, dynamic>;
-    final List<dynamic> rawList = json['activityTypes'] as List<dynamic>;
+    final List<dynamic> rawList = json['userRoles'] as List<dynamic>;
     return rawList.map((e) => e as String).toList();
   }
 
-  Future<User> createUser(CreateUserRequest req) async {
+  Future<User> createUser(UserCreateRequest req) async {
     final response = await dio.post(
       '/users',
       data: req.toJson(),
@@ -62,11 +63,18 @@ class UserRepository {
     return User.fromJson(response.data as Map<String, dynamic>);
   }
 
-  Future<void> deleteUserById(String id) async {
+  Future<void> updateUser(String userId, UserUpdateRequest req) async {
+    await dio.put(
+      '/users/$userId',
+      data: req.toJson(),
+    );
+  }
+
+  Future<void> disableUserById(String id) async {
     try {
       await dio.delete('/users/$id');
     } catch (e) {
-      debugPrint('[AuthRepository] deleteAccount failed: $e');
+      debugPrint('[UserRepository] disableAccount failed: $e');
     }
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();

@@ -1,30 +1,14 @@
 import 'package:cesizen_frontend/core/network/dio_provider.dart';
+import 'package:cesizen_frontend/features/user/domain/user_update_request.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cesizen_frontend/features/user/data/user_repository.dart';
 import 'package:cesizen_frontend/features/user/domain/user.dart';
-import 'package:cesizen_frontend/core/domain/paginated_response.dart';
-import 'package:cesizen_frontend/features/user/domain/create_user_request.dart';
-
-import 'domain/user_filter_request.dart';
+import 'package:cesizen_frontend/features/user/domain/user_create_request.dart';
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   final dio = ref.watch(dioProvider);
   return UserRepository(dio);
 });
-
-final usersProvider = FutureProvider.autoDispose.family<PaginatedResponse<User>, UserFilter>(
-      (ref, filter) {
-    final repo = ref.watch(userRepositoryProvider);
-    return repo.fetchUsers(
-      username: filter.username,
-      email: filter.email,
-      disabled: filter.disabled,
-      role: filter.role,
-      pageNumber: filter.pageNumber,
-      pageSize: filter.pageSize,
-    );
-  },
-);
 
 final userByIdProvider = FutureProvider.autoDispose.family<User, String>(
       (ref, userId) {
@@ -43,16 +27,20 @@ final userRolesProvider = FutureProvider.autoDispose<List<String>>((ref) {
   return repo.fetchUserRoles();
 });
 
-final createUserProvider = Provider.autoDispose<CreateUserNotifier>((ref) {
+final formUserProvider = Provider.autoDispose<FormUserNotifier>((ref) {
   final repo = ref.watch(userRepositoryProvider);
-  return CreateUserNotifier(repo);
+  return FormUserNotifier(repo);
 });
 
-class CreateUserNotifier {
+class FormUserNotifier {
   final UserRepository _repo;
-  CreateUserNotifier(this._repo);
+  FormUserNotifier(this._repo);
 
-  Future<User> createUser(CreateUserRequest req) async {
+  Future<User> createUser(UserCreateRequest req) async {
     return _repo.createUser(req);
+  }
+
+  Future<void> updateUser(String userId, UserUpdateRequest req) async {
+    _repo.updateUser(userId, req);
   }
 }

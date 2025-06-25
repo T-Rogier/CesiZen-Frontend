@@ -23,7 +23,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool _rememberMe = false;
 
   Future<void> _login() async {
-    debugPrint('[LOGIN PAGE] Bouton cliqué');
     final email = _emailController.text;
     final password = _passwordController.text;
 
@@ -114,7 +113,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: () => context.push('/home'),
+                      onPressed: () => context.push('/debug'),
                       child: const Text('Voir Debug'),
                     ),
                   ],

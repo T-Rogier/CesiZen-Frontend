@@ -1,21 +1,22 @@
 import 'dart:async';
 
 import 'package:cesizen_frontend/app/theme/app_theme.dart';
-import 'package:cesizen_frontend/features/activities/presentation/providers/activity_provider.dart';
-import 'package:cesizen_frontend/features/activities/presentation/widgets/activity_card.dart';
-import 'package:cesizen_frontend/features/activities/presentation/widgets/activities_filters_dropdown.dart';
+import 'package:cesizen_frontend/features/user/presentation/providers/user_notifier.dart';
+import 'package:cesizen_frontend/features/user/presentation/widgets/user_card.dart';
+import 'package:cesizen_frontend/features/user/presentation/widgets/users_filters_dropdown.dart';
 import 'package:cesizen_frontend/shared/widgets/inputs/app_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class ActivitiesPage extends ConsumerStatefulWidget {
-  const ActivitiesPage({super.key});
+class UsersPage extends ConsumerStatefulWidget {
+  const UsersPage({super.key});
 
   @override
-  ConsumerState<ActivitiesPage> createState() => _ActivitiesPageState();
+  ConsumerState<UsersPage> createState() => _UsersPageState();
 }
 
-class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
+class _UsersPageState extends ConsumerState<UsersPage> {
   bool _showFilters = false;
   String searchQuery = '';
   final _scrollCtrl = ScrollController();
@@ -27,12 +28,12 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
     _scrollCtrl.addListener(() {
       if (_scrollCtrl.position.pixels >=
           _scrollCtrl.position.maxScrollExtent - 100) {
-        ref.read(activityProvider.notifier).loadMore();
+        ref.read(userProvider.notifier).loadMore();
       }
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(activityProvider.notifier).loadMore();
+      ref.read(userProvider.notifier).loadMore();
     });
   }
 
@@ -47,15 +48,19 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
     setState(() => searchQuery = val);
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      ref.read(activityProvider.notifier).searchActivities(query: searchQuery);
+      ref.read(userProvider.notifier).searchUsers(query: searchQuery);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final asyncState = ref.watch(activityProvider);
+    final asyncState = ref.watch(userProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Utilisateurs'),
+        backgroundColor: AppColors.greenFill,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -64,7 +69,7 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
               children: [
                 Expanded(
                   child: AppSearchBar(
-                    hintText: 'Rechercher une activité...',
+                    hintText: 'Rechercher un utilisateur...',
                     value: searchQuery,
                     onChanged: _onSearchChanged,
                   ),
@@ -97,39 +102,24 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
               data: (state) {
                 return Column( children: [
                   if (_showFilters)
-                    ActivityFiltersDropdown(
+                    UsersFiltersDropdown(
                       isVisible: _showFilters,
                       onToggle: () => setState(() => _showFilters = !_showFilters),
-                      selectedType: state.selectedType,
-                      startDuration: state.startDuration,
-                      endDuration:   state.endDuration,
-                      selectedCategories: state.selectedCategories,
+                      selectedRole: state.selectedRole,
+                      disabled: state.disabled,
 
-                      onTypeChanged: (type) {
-                        ref.read(activityProvider.notifier).searchActivities(
+                      onRoleChanged: (role) {
+                        ref.read(userProvider.notifier).searchUsers(
                           query: searchQuery,
-                          type: type,
-                          startDuration: state.startDuration,
-                          endDuration: state.endDuration,
-                          categories: state.selectedCategories,
+                          role: role,
+                          disabled: state.disabled,
                         );
                       },
-                      onDurationChanged: (sd, ed) {
-                        ref.read(activityProvider.notifier).searchActivities(
+                      onDisabledChanged: (disabled) {
+                        ref.read(userProvider.notifier).searchUsers(
                           query: searchQuery,
-                          type: state.selectedType,
-                          startDuration: sd,
-                          endDuration: ed,
-                          categories: state.selectedCategories,
-                        );
-                      },
-                      onCategoriesChanged: (cats) {
-                        ref.read(activityProvider.notifier).searchActivities(
-                          query: searchQuery,
-                          type: state.selectedType,
-                          startDuration: state.startDuration,
-                          endDuration: state.endDuration,
-                          categories: cats,
+                          role: state.selectedRole,
+                          disabled: disabled,
                         );
                       },
                     ),
@@ -142,26 +132,28 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error:   (e,_) => Center(child: Text('Erreur : $e')),
                 data:    (state) {
-                  if (state.activities.isEmpty) {
+                  if (state.users.isEmpty) {
                     return const Center(
                       child: Text(
-                        'Aucune activité trouvée',
+                        'Aucun utilisateur trouvé',
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     );
                   }
                   return ListView.builder(
                     controller: _scrollCtrl,
-                    itemCount: state.activities.length + (state.hasMore ? 1 : 0),
+                    itemCount: state.users.length + (state.hasMore ? 1 : 0),
                     itemBuilder: (context, i) {
-                      if (i < state.activities.length) {
-                        final act = state.activities[i];
-                        return ActivityCard(
-                          id: act.id,
-                          title: act.title,
-                          subtitle: act.estimatedDuration,
-                          imageUrl: act.thumbnailImageLink,
-                          participationCount: act.viewCount,
+                      if (i < state.users.length) {
+                        final user = state.users[i];
+                        return UserCard(
+                          user: user,
+                          onTap: () {
+                            context.push('/user/${user.id}');
+                          },
+                          onDisable: () {
+                            ref.read(userProvider.notifier).disableUser(user.id);
+                          },
                         );
                       }
                       return const Padding(

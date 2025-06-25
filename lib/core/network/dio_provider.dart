@@ -106,7 +106,8 @@ final dioProvider = Provider<Dio>((ref) {
 
           final prefs = await SharedPreferences.getInstance();
           await prefs.clear();
-          ref.read(authProvider.notifier).logout();
+          queue.clear();
+          ref.read(authProvider.notifier).becomeUnauthenticated();
           handler.next(err);
         } finally {
           isRefreshing = false;

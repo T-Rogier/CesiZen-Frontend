@@ -1,13 +1,11 @@
-class CreateUserRequest {
+class UserUpdateRequest {
   final String username;
-  final String email;
   final String password;
   final String confirmPassword;
   final String role;
 
-  CreateUserRequest({
+  UserUpdateRequest({
     required this.username,
-    required this.email,
     required this.password,
     required this.confirmPassword,
     required this.role,
@@ -15,11 +13,9 @@ class CreateUserRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'username': username,
-      'email': email,
-      'password': password,
-      'confirmPassword': confirmPassword,
-      'role': role,
+      if (username.trim().isNotEmpty) 'username': username,
+      if (password.trim().isNotEmpty) 'password': password,
+      if (confirmPassword.trim().isNotEmpty) 'confirmPassword': confirmPassword,
     };
   }
 }

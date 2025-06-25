@@ -3,9 +3,9 @@ import 'package:cesizen_frontend/features/categories/presentation/providers/cate
 import 'package:flutter/material.dart';
 import 'package:cesizen_frontend/features/activities/presentation/widgets/custom_filter_chip.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'custom_dropdown_filter.dart';
+import 'custom_activities_dropdown_filter.dart';
 
-class FiltersDropdown extends ConsumerStatefulWidget {
+class ActivityFiltersDropdown extends ConsumerStatefulWidget {
   final bool isVisible;
   final VoidCallback onToggle;
 
@@ -19,7 +19,7 @@ class FiltersDropdown extends ConsumerStatefulWidget {
 
   final void Function(Duration? start, Duration? end) onDurationChanged;
 
-  const FiltersDropdown({
+  const ActivityFiltersDropdown({
     super.key,
     required this.isVisible,
     required this.onToggle,
@@ -33,10 +33,10 @@ class FiltersDropdown extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<FiltersDropdown> createState() => _FiltersDropdownState();
+  ConsumerState<ActivityFiltersDropdown> createState() => _FiltersDropdownState();
 }
 
-class _FiltersDropdownState extends ConsumerState<FiltersDropdown> {
+class _FiltersDropdownState extends ConsumerState<ActivityFiltersDropdown> {
   @override
   Widget build(BuildContext context) {
     final catsAsync = ref.watch(categoriesProvider);
@@ -61,7 +61,7 @@ class _FiltersDropdownState extends ConsumerState<FiltersDropdown> {
                     DropdownFilterItem(value: 'all', label: 'Tout'),
                     ...types.map((t) => DropdownFilterItem(value: t, label: t)),
                   ];
-                  return CustomDropdownFilter<String>(
+                  return CustomActivitiesDropdownFilter<String>(
                     label: 'Type d’activité',
                     value: widget.selectedType,
                     items: items,
@@ -69,7 +69,7 @@ class _FiltersDropdownState extends ConsumerState<FiltersDropdown> {
                   );
                 },
               ),
-              CustomDropdownFilter<String>(
+              CustomActivitiesDropdownFilter<String>(
                 label: 'Durée estimée',
                 value: () {
                   final sd = widget.startDuration;

@@ -63,6 +63,10 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
     state = const AsyncValue.data(AuthState.unauthenticated());
   }
 
+  Future<void> becomeUnauthenticated() async {
+    state = const AsyncValue.data(AuthState.unauthenticated());
+  }
+
   Future<void> refreshSessionFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     try {

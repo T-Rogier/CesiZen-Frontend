@@ -3,6 +3,7 @@ import 'package:cesizen_frontend/features/categories/domain/category.dart';
 import 'package:cesizen_frontend/features/categories/domain/category_request.dart';
 import 'package:cesizen_frontend/features/categories/presentation/providers/category_notifier.dart';
 import 'package:cesizen_frontend/features/categories/presentation/providers/category_provider.dart';
+import 'package:cesizen_frontend/shared/widgets/buttons/app_button.dart';
 import 'package:cesizen_frontend/shared/widgets/inputs/app_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,7 +24,7 @@ class CategoryFormPage extends ConsumerWidget {
         body: Center(child: CircularProgressIndicator()),
       ),
       error: (e,_) => Scaffold(
-        body: Center(child: Text('Erreur: \$e')),
+        body: Center(child: Text('Erreur: $e')),
       ),
       data: (existing) {
         return _CategoryFormBody(
@@ -74,13 +75,10 @@ class _CategoryFormBodyState extends ConsumerState<_CategoryFormBody> {
 
     try {
       final repo = ref.read(categoryRepositoryProvider);
-      late Category result;
       if (widget.category == null) {
-        // Création
-        result = await repo.createCategory(dto);
+        await repo.createCategory(dto);
       } else {
-        // Mise à jour
-        result = await repo.updateCategory(widget.category!.id, dto);
+        await repo.updateCategory(widget.category!.id, dto);
       }
 
       if (mounted) {
@@ -90,9 +88,11 @@ class _CategoryFormBodyState extends ConsumerState<_CategoryFormBody> {
         context.pop();
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la création : $e')),
-      );
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur lors de la création : $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -132,25 +132,13 @@ class _CategoryFormBodyState extends ConsumerState<_CategoryFormBody> {
                 },
               ),
               const SizedBox(height: 24),
-              ElevatedButton(
+              AppButton(
                 onPressed: _isSubmitting ? null : _submit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.yellowPrincipal,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
-                ),
-                child: _isSubmitting
-                    ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    color: AppColors.black,
-                    strokeWidth: 2,
-                  ),
-                )
-                    : Text(widget.category == null ? 'Créer' : 'Enregister', style: AppTextStyles.button),
-              ),
+                text: widget.category == null ? 'Créer' : 'Enregister',
+                backgroundColor: AppColors.yellowPrincipal,
+                textColor: AppColors.black,
+                isLoading: _isSubmitting,
+              )
             ],
           ),
         ),

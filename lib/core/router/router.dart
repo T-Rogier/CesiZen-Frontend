@@ -12,7 +12,9 @@ import 'package:cesizen_frontend/features/forbidden/presentation/pages/forbidden
 import 'package:cesizen_frontend/features/forbidden/presentation/pages/login_required_page.dart';
 import 'package:cesizen_frontend/features/main/presentation/main_scaffold.dart';
 import 'package:cesizen_frontend/features/user/presentation/pages/profile_page.dart';
-import 'package:cesizen_frontend/shared/widgets/drawer/app_drawer.dart';
+import 'package:cesizen_frontend/features/user/presentation/pages/user_form_page.dart';
+import 'package:cesizen_frontend/features/user/presentation/pages/users_page.dart';
+import 'package:cesizen_frontend/shared/widgets/drawer/app_admin_drawer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -80,19 +82,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, child) {
           final location = GoRouterState.of(context).uri.toString();
 
-          final onActivities = location.startsWith('/activities');
+          final onHome = location.startsWith('/home');
           final onArticles   = location.startsWith('/articles');
 
           return Consumer(
             builder: (context, ref, _) {
               final authState = ref.watch(authProvider).value;
               final role = authState?.session?.role;
-              final showActivitiesDrawer = onActivities && role == 'Admin';
+              final showAdminDrawer = onHome && role == 'Admin';
 
               final showArticlesDrawer = onArticles;
 
-              final drawer = showActivitiesDrawer
-                  ? const MyAppDrawer()
+              final drawer = showAdminDrawer
+                  ? const AppAdminDrawer()
                   : showArticlesDrawer
                   ? const MenuDrawer()
                   : null;
@@ -137,6 +139,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return ArticleDetailPage(articleId: id);
+        },
+      ),
+      GoRoute(path: '/users', builder: (_, _) => const UsersPage()),
+      GoRoute(path: '/user/create', builder: (_, _) => const UserFormPage()),
+      GoRoute(
+        path: '/user/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return UserFormPage(userId: id);
         },
       ),
       GoRoute(path: '/debug', builder: (_, _) => const DebugPage()),
