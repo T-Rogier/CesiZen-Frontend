@@ -1,4 +1,7 @@
 import 'package:cesizen_frontend/core/router/routes.dart';
+import 'package:cesizen_frontend/features/articles/presentation/pages/article_detail_page.dart';
+import 'package:cesizen_frontend/features/articles/presentation/widgets/menu_drawer.dart';
+import 'package:cesizen_frontend/features/articles/presentation/pages/articles_page.dart';
 import 'package:cesizen_frontend/features/activities/presentation/pages/activity_create_page.dart';
 import 'package:cesizen_frontend/features/activities/presentation/pages/activity_detail_page.dart';
 import 'package:cesizen_frontend/features/auth/presentation/providers/go_router_refresh_notifier.dart';
@@ -21,7 +24,6 @@ import 'package:cesizen_frontend/features/unboarding/presentation/pages/unboardi
 import 'package:cesizen_frontend/features/auth/presentation/pages/login_page.dart';
 import 'package:cesizen_frontend/features/auth/presentation/pages/register_page.dart';
 import 'package:cesizen_frontend/features/home/presentation/pages/home_page.dart';
-import 'package:cesizen_frontend/features/search/presentation/pages/search_page.dart';
 import 'package:cesizen_frontend/features/activities/presentation/pages/activities_page.dart';
 
 final goRouterRefreshProvider = Provider<GoRouterRefreshNotifier>(
@@ -76,16 +78,23 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       ShellRoute(
         builder: (context, state, child) {
-          final location   = GoRouterState.of(context).uri.toString();
-          final showOnPath = location.startsWith('/activities');
+          final location = GoRouterState.of(context).uri.toString();
+
+          final onActivities = location.startsWith('/activities');
+          final onArticles   = location.startsWith('/articles');
 
           return Consumer(
             builder: (context, ref, _) {
               final authState = ref.watch(authProvider).value;
               final role = authState?.session?.role;
+              final showActivitiesDrawer = onActivities && role == 'Admin';
 
-              final drawer = showOnPath && role == 'Admin'
+              final showArticlesDrawer = onArticles;
+
+              final drawer = showActivitiesDrawer
                   ? const MyAppDrawer()
+                  : showArticlesDrawer
+                  ? const MenuDrawer()
                   : null;
 
               return MainScaffold(
@@ -97,7 +106,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
         routes: [
           GoRoute(path: '/home', builder: (context, state) => const HomePage()),
-          GoRoute(path: '/search', builder: (context, state) => const SearchPage()),
+          GoRoute(path: '/articles', builder: (context, state) => const ArticlesPage()),
           GoRoute(path: '/activities', builder: (context, state) => const ActivitiesPage()),
           GoRoute(path: '/profile', builder: (context, state) => const ProfilePage()),
         ],
@@ -121,6 +130,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return CategoryFormPage(categoryId: id);
+        },
+      ),
+      GoRoute(
+        path: '/article/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return ArticleDetailPage(articleId: id);
         },
       ),
       GoRoute(path: '/debug', builder: (_, _) => const DebugPage()),

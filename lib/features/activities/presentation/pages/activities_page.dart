@@ -150,7 +150,6 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
                       ),
                     );
                   }
-                  // Sinon on construit la liste paginée
                   return ListView.builder(
                     controller: _scrollCtrl,
                     itemCount: state.activities.length + (state.hasMore ? 1 : 0),
@@ -165,7 +164,6 @@ class _ActivitiesPageState extends ConsumerState<ActivitiesPage> {
                           participationCount: act.viewCount,
                         );
                       }
-                      // loader en bas pour la pagination
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
                         child: Center(child: CircularProgressIndicator()),

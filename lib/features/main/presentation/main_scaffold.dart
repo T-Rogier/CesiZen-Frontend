@@ -43,7 +43,7 @@ class MainScaffold extends StatelessWidget {
   }
 
   int _calculateIndex(String location) {
-    if (location.startsWith('/search')) return 1;
+    if (location.startsWith('/articles')) return 1;
     if (location.startsWith('/activities')) return 2;
     if (location.startsWith('/profile')) return 3;
     return 0;

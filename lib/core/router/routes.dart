@@ -4,17 +4,18 @@ const publicRoutes = {
   '/welcome',
   '/unboarding',
   '/debug',
-  '/search',
+  '/articles',
   '/activities',
   '/activity',
   '/home',
-  '/profile'
+  '/profile',
+  '/article',
 };
 
 const roleAllowed = {
   'Admin': <String>{
     '/home',
-    '/search',
+    '/articles',
     '/activities',
     '/activity',
     '/activity/create',
@@ -24,12 +25,14 @@ const roleAllowed = {
     '/users',
     '/user/create',
     '/profile',
+    '/article',
   },
   'User': <String>{
     '/home',
-    '/search',
+    '/articles',
     '/activities',
     '/activity',
     '/profile',
+    '/article',
   },
 };
