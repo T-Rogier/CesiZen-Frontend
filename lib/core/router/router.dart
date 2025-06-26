@@ -1,4 +1,6 @@
 import 'package:cesizen_frontend/core/router/routes.dart';
+import 'package:cesizen_frontend/features/activities/domain/full_activity.dart';
+import 'package:cesizen_frontend/features/activities/presentation/pages/activity_participation_page.dart';
 import 'package:cesizen_frontend/features/articles/presentation/pages/article_detail_page.dart';
 import 'package:cesizen_frontend/features/articles/presentation/widgets/menu_drawer.dart';
 import 'package:cesizen_frontend/features/articles/presentation/pages/articles_page.dart';
@@ -118,6 +120,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
       GoRoute(path: '/register', builder: (_, _) => const RegisterPage()),
       GoRoute(path: '/activity/create', builder: (_, _) => const ActivityCreatePage()),
+      GoRoute(
+        path: '/activity/participate',
+        builder: (context, state) {
+          final activity = state.extra as FullActivity;
+          return ActivityParticipationPage(activity: activity);
+        },
+      ),
       GoRoute(
         path: '/activity/:id',
         builder: (context, state) {

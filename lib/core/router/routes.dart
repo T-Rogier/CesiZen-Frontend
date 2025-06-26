@@ -33,6 +33,7 @@ const roleAllowed = {
     '/articles',
     '/activities',
     '/activity',
+    '/activity/participate',
     '/profile',
     '/article',
   },

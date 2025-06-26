@@ -3,6 +3,7 @@ import 'package:cesizen_frontend/features/activities/domain/full_activity.dart';
 import 'package:cesizen_frontend/features/activities/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 
 class ActivityDetailPage extends ConsumerWidget {
@@ -30,7 +31,11 @@ class ActivityDetailPage extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: const CloseButton(color: AppColors.greenFont),
+        leading: CloseButton(
+          onPressed: () => {
+            context.go("/activities")
+          },
+        ),
       ),
       body: asyncAct.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -114,7 +119,10 @@ class ActivityDetailPage extends ConsumerWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: démarrer l'activité
+                          context.push(
+                            '/activity/participate',
+                            extra: act,
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.yellowPrincipal,
