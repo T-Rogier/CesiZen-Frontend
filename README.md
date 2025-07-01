@@ -1,16 +1,30 @@
-# cesizen_frontend
+## Frontend (CesiZen-Frontend)
 
-Frontend de l'application CesiZen
+### 1. Configuration des variables d'environnement
 
-## Getting Started
+Dans le dossier `CesiZen-Frontend`, créez un fichier `.env` :
 
-This project is a starting point for a Flutter application.
+```env
+API_BASE_URL=http://localhost:5000
+```
 
-A few resources to get you started if this is your first Flutter project:
+### 2. Installation des dépendances
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```powershell
+cd CesiZen-Frontend
+flutter pub get
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 3. Lancer l'application
+
+> Pour iOS/Android :
+```powershell
+flutter run
+```
+
+> Pour web (Chrome) :
+```powershell
+flutter run -d chrome
+```
+
+---
